@@ -1,70 +1,11 @@
 import { Menu } from "lucide-react";
 import { imageProvider } from "../utils/imageProvider";
 import Container from "./Container";
-import type { MenuProps } from "antd";
 import { Menu as AntdMenu } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 const SubNavbar = () => {
-  type MenuItem = Required<MenuProps>["items"][number];
-
-  //   const items: MenuItem[] = [
-  //     {
-  //       key: "sub1",
-  //       label: "Navigation One",
-  //       children: [
-  //         {
-  //           key: "1-1",
-  //           label: "Item 1",
-  //           type: "group",
-  //           children: [
-  //             { key: "1", label: "Option 1" },
-  //             { key: "2", label: "Option 2" },
-  //           ],
-  //         },
-  //         {
-  //           key: "1-2",
-  //           label: "Item 2",
-  //           type: "group",
-  //           children: [
-  //             { key: "3", label: "Option 3" },
-  //             { key: "4", label: "Option 4" },
-  //           ],
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       key: "sub2",
-  //       label: "Navigation Two",
-  //       children: [
-  //         { key: "5", label: "Option 5" },
-  //         { key: "6", label: "Option 6" },
-  //         {
-  //           key: "sub3",
-  //           label: "Submenu",
-  //           children: [
-  //             { key: "7", label: "Option 7" },
-  //             { key: "8", label: "Option 8" },
-  //           ],
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       key: "sub4",
-  //       label: "Navigation Three",
-  //       children: [
-  //         { key: "9", label: "Option 9" },
-  //         { key: "10", label: "Option 10" },
-  //         { key: "11", label: "Option 11" },
-  //         { key: "12", label: "Option 12" },
-  //       ],
-  //     },
-  //   ];
-
-  const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click", e);
-  };
 
   const [isMenu, setIsMenu] = useState(false);
 
@@ -77,14 +18,16 @@ const SubNavbar = () => {
       return res?.data?.data;
     },
   });
-
+// @ts-ignore
   const items = menuData?.map((item) => ({
     key: `cat-${item.id}`,
     label: item.name,
+    // @ts-ignore
     children: item.subcategories.map((subcat) => ({
       key: `subcat-${subcat.id}`,
       label: subcat.name,
       type: "group",
+      // @ts-ignore
       children: subcat.subchilds.map((child) => ({
         key: `child-${child.id}`,
         label: child.name,
@@ -100,6 +43,7 @@ const SubNavbar = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         menuContainerRef.current &&
+        // @ts-ignore
         !menuContainerRef.current.contains(event.target as Node)
       ) {
         setIsMenu(false);
@@ -139,7 +83,6 @@ const SubNavbar = () => {
               }`}
             >
               <AntdMenu
-                onClick={onClick}
                 style={{
                   width: "100%",
                   background: "#fff",

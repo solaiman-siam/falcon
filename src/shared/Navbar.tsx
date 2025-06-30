@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { imageProvider } from "../utils/imageProvider";
 import Container from "./Container";
+import { Link } from "react-router";
 
 const Navbar = () => {
   return (
@@ -17,12 +18,14 @@ const Navbar = () => {
           </div>
         </div>
         <div className="flex items-center gap-6">
+          <Link to={'/cart'}>
           <div className="relative">
             <img className="cursor-pointer" src={imageProvider.Cart} alt="Cart" />
             <div className="bg-red-500 w-5 h-5  absolute -top-2 -right-2 rounded-full text-white flex justify-center items-center text-sm">
                 <h4>2</h4>
             </div>
           </div>
+          </Link>
           <img className="cursor-pointer" src={imageProvider.Head} alt="Head" />
         </div>
       </div>

@@ -2,6 +2,7 @@ import { ChevronRight, Minus, Plus, Trash2 } from "lucide-react";
 import Container from "../shared/Container";
 import { imageProvider } from "../utils/imageProvider";
 import { Checkbox } from "antd";
+import { useState } from "react";
 
 const MyCartPage = () => {
 
@@ -15,6 +16,8 @@ const MyCartPage = () => {
 
   }
 
+
+  const [count, setCount] = useState<number>(1)
 
   return (
     <div className="py-24 bg-[#f1f5f9]">
@@ -55,15 +58,15 @@ const MyCartPage = () => {
                     <div className="pt-4">
                   <div className="flex items-center gap-4">
                     <div className="flex rounded-full border border-black/8 w-4/12 justify-between items-center gap-4">
-                    <button className="px-2.5 py-2.5 rounded-full border-2 cursor-pointer border-white bg-[#F1F5F9]">
+                    <button onClick={() => count > 1 && setCount( count - 1)} className="px-2.5 py-2.5 rounded-full border-2 cursor-pointer border-white bg-[#F1F5F9]">
                       <Minus className="size-5 text-black/50" />
                     </button>
-                    <h4 className="select-none font-medium text-black/90">02</h4>
-                    <button className="px-2.5 py-2.5 rounded-full cursor-pointer border-2 border-white bg-[#F1F5F9]">
+                    <h4 className="select-none font-medium text-black/90">{count}</h4>
+                    <button onClick={() => setCount( count + 1)} className="px-2.5 py-2.5 rounded-full cursor-pointer border-2 border-white bg-[#F1F5F9]">
                       <Plus  className="size-5 text-black/50" />
                     </button>
                   </div>
-                    <button className="cursor-pointer">
+                    <button  className="cursor-pointer">
                       <Trash2 size={20} className="text-black/40"/>
                     </button>
                   </div>

@@ -1,4 +1,11 @@
-import { ChevronDown, Minus, Plus, Share2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader,
+  Minus,
+  Plus,
+  Share2,
+} from "lucide-react";
 import Container from "../shared/Container";
 import { imageProvider } from "../utils/imageProvider";
 import { Rating } from "@smastrom/react-rating";
@@ -6,6 +13,7 @@ import { GoHeart } from "react-icons/go";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
+// @ts-ignore
 import "swiper/css";
 
 // import required modules
@@ -14,21 +22,25 @@ import "@smastrom/react-rating/style.css";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
+import { description, features } from "../utils/staticData";
+import toast from "react-hot-toast";
 const ProductPage = () => {
   const [currentSlug, setCurrentSlug] = useState("iphone-15-plus");
+  const [quantity, setQuantity] = useState(1);
+
   const starStyles = {
     itemShapes: (
       <path d="M11.0748 3.25583C11.4141 2.42845 12.5859 2.42845 12.9252 3.25583L14.6493 7.45955C14.793 7.80979 15.1221 8.04889 15.4995 8.07727L20.0303 8.41798C20.922 8.48548 21.2841 9.59942 20.6021 10.1778L17.1369 13.1166C16.8482 13.3614 16.7227 13.7483 16.8122 14.1161L17.8882 18.5304C18.1 19.3992 17.152 20.0879 16.3912 19.618L12.5255 17.1635C12.2034 16.9599 11.7966 16.9599 11.4745 17.1635L7.60881 19.618C6.84796 20.0879 5.90001 19.3992 6.1118 18.5304L7.18785 14.1161C7.27729 13.7483 7.1518 13.3614 6.86314 13.1166L3.3979 10.1778C2.71588 9.59942 3.07796 8.48548 3.96971 8.41798L8.50046 8.07727C8.87794 8.04889 9.20704 7.80979 9.35068 7.45955L11.0748 3.25583Z" />
     ),
-    activeFillColor: "#EAB308", // Filled star color
-    inactiveFillColor: "#EAB308", // Empty star color
+    activeFillColor: "#EAB308",
+    inactiveFillColor: "#EAB308",
   };
 
   const sizeStyle =
     "size-11 hover:border-[#00A788] flex transition-all duration-150 cursor-pointer items-center justify-center  rounded-md border border-black/10";
 
   // get product data
-  const { data: products = [], isLoading } = useQuery({
+  const { data: products = [] } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const res = await axios.get(
@@ -50,14 +62,39 @@ const ProductPage = () => {
     enabled: !!currentSlug,
   });
 
-  console.log(productDetails);
-
   const handleProductClick = (slug: string) => {
     if (slug) {
       setCurrentSlug(slug);
     }
   };
 
+  const [isExpanded, setIsExpanded] = useState(false);
+  const displayText = isExpanded
+    ? description
+    : `${description.slice(0, 402)}...`;
+
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
+
+  // Number of features to show when collapsed
+  const initialFeaturesToShow = 3;
+
+  const [loading, setLoading] = useState(false);
+  const handleAddtoCart = (slug: string) => {
+    setLoading(true);
+    if (slug) {
+      setTimeout(() => {
+        setLoading(true);
+    const prevItems = JSON.parse(localStorage.getItem('products') || '[]');
+    if (!Array.isArray(prevItems)) {
+      throw new Error('Invalid cart data in localStorage');
+    }
+    const updatedItems = [...prevItems, { slug, quantity }];
+    localStorage.setItem("products", JSON.stringify(updatedItems));
+    toast.success("Product added to cart successfully");
+    setLoading(false);
+      }, 1000);
+    }
+  };
   return (
     <div>
       <Container>
@@ -68,7 +105,7 @@ const ProductPage = () => {
                 {/* main image */}
                 <div className="h-[400px] overflow-hidden">
                   <img
-                    className="w-full h-full object-cover rounded-md"
+                    className="w-full hover:scale-110 transition-all duration-200 h-full object-cover rounded-md"
                     src={productDetails?.thumbnail}
                     alt="product"
                   />
@@ -77,7 +114,7 @@ const ProductPage = () => {
                 <div className="  gap-2 pt-2">
                   <Swiper
                     slidesPerView={5}
-                    spaceBetween={30}
+                    spaceBetween={10}
                     pagination={{
                       clickable: true,
                     }}
@@ -101,7 +138,7 @@ const ProductPage = () => {
                 </div>
               </div>
               {/* description */}
-              <div className="col-span-7 w">
+              <div className="col-span-7 h-full">
                 <h3 className="text-xl font-semibold  text-black/80">
                   {productDetails?.name}
                 </h3>
@@ -154,23 +191,22 @@ const ProductPage = () => {
                 </div>
                 {/* colors */}
                 <div className="pt-4">
-                 {
-                  productDetails?.is_variant &&  <h4 className="flex font-medium items-center gap-1">
-                    <span className="text-black/80">Available Color:</span>{" "}
-                    <span>Navy Blue</span>
-                  </h4>
-                 }
+                  {productDetails?.is_variant && (
+                    <h4 className="flex font-medium items-center gap-1">
+                      <span className="text-black/80">Available Color:</span>{" "}
+                      <span>Navy Blue</span>
+                    </h4>
+                  )}
                   <div className="flex items-center w-6/12 pt-4  gap-2">
-                    {
-                      productDetails?.variations?.map((colors) => (
-                        <div>
-                          <img
-                            className="rounded-sm"
-                            src={colors?.image}
-                            alt="variants"
-                          />
-                        </div>
-                      ))}
+                    {productDetails?.variations?.map((colors) => (
+                      <div>
+                        <img
+                          className="rounded-sm"
+                          src={colors?.image}
+                          alt="variants"
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
                 {/* sizes */}
@@ -188,27 +224,41 @@ const ProductPage = () => {
                 <div className="pt-4">
                   <h4 className="pb-2 font-medium">Quantity</h4>
                   <div className="flex rounded-full border border-black/8 w-4/12 justify-between items-center gap-4">
-                    <button className="px-2.5 py-2.5 rounded-full border-2 cursor-pointer border-white bg-[#F1F5F9]">
+                    <button
+                      onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                      className="px-2.5 py-2.5 rounded-full border-2 cursor-pointer border-white bg-[#F1F5F9]"
+                    >
                       <Minus className="size-5 text-black/50" />
                     </button>
                     <h4 className="select-none font-medium text-black/90">
-                      02
+                      {quantity}
                     </h4>
-                    <button className="px-2.5 py-2.5 rounded-full cursor-pointer border-2 border-white bg-[#F1F5F9]">
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-2.5 py-2.5 rounded-full cursor-pointer border-2 border-white bg-[#F1F5F9]"
+                    >
                       <Plus className="size-5 text-black/50" />
                     </button>
                   </div>
                 </div>
                 {/* cart button */}
                 <div className="pt-4">
-                  <button className="w-8/12 bg-[#00A788] cursor-pointer text-white rounded-md py-3 font-medium ">
-                    Add to Cart
+                  <button
+                    onClick={() => handleAddtoCart(productDetails?.slug)}
+                    className="w-8/12 bg-[#00A788] cursor-pointer text-white rounded-md h-12 flex justify-center items-center font-medium "
+                  >
+                    {loading ? (
+                      <Loader className="animate-spin" />
+                    ) : (
+                      "Add to Cart"
+                    )}
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          {/* rightside */}
+
+          {/* right side summary */}
           <div className="col-span-3 flex  flex-col gap-3 ">
             <div className="rounded-xl border border-black/10 p-4">
               <h3 className="text-black/80 pb-2 text-lg">Delivery Options</h3>
@@ -240,8 +290,15 @@ const ProductPage = () => {
             </div>
             <div className="rounded-xl border border-black/10 p-4">
               <h3 className="text-black/80 pb-2 text-lg">Sold by</h3>
-              <div>
-                <img src={imageProvider.RisingStar} alt="" />
+              <div className="flex items-center gap-4">
+                <img src={imageProvider.PnyLogo} alt="" />
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <h3>{productDetails?.merchant?.shop_name}</h3>
+                    <img src={imageProvider.CheckMark} alt="" />
+                  </div>
+                  <img src={imageProvider.RisingStarShop} alt="" />
+                </div>
               </div>
               <div className="flex border-b pb-3 border-black/10 items-center pt-4 gap-2">
                 <div className="flex justify-center flex-1 bg-[#E6F8F4] px-2 rounded-sm py-2 items-center gap-2">
@@ -272,27 +329,26 @@ const ProductPage = () => {
           </div>
         </div>
       </Container>
+
+      {/* description */}
       <div className="bg-[#F1F5F9] py-4">
         <Container>
           <div className="w-[77%] flex flex-col gap-3 pb-20">
             {/* description */}
             <div className="p-5 rounded-md bg-white">
               <h3 className="text-lg font-medium pb-4">Description</h3>
-              <p className="text-black/70 ">
-                Just as a book is judged by its cover, the first thing you
-                notice when you pick up a modern smartphone is the display.
-                Nothing surprising, because advanced technologies allow you to
-                practically level the display frames and cutouts for the front
-                camera and speaker, leaving no room for bold design solutions.
-                And how good that in such realities Apple everything is fine
-                with displays. Advanced technologies allow you to practically
-                level the display frames and cutouts for the front camera and
-                speaker, leaving no room for bold design solutions. And how good
-                that in such realities Apple everything
-              </p>
+              <p className="text-black/70 ">{displayText} </p>
               <div className="flex justify-center pt-2 items-center">
-                <button className="flex cursor-pointer items-center gap-1 font-medium text-sm">
-                  See More <ChevronDown strokeWidth={1.2} />
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex cursor-pointer items-center gap-1 text-black/70 font-medium text-sm transition-colors"
+                >
+                  {isExpanded ? "Show Less" : "Show More"}
+                  {isExpanded ? (
+                    <ChevronUp strokeWidth={1.2} />
+                  ) : (
+                    <ChevronDown strokeWidth={1.2} />
+                  )}
                 </button>
               </div>
             </div>
@@ -300,20 +356,33 @@ const ProductPage = () => {
             <div className="p-5 rounded-md bg-white">
               <h3 className="text-lg font-medium pb-4">Specification</h3>
               <div className="text-black/70 ">
-                <h4 className="pb-2 font-medium pb-4">
-                  Sharp FP-J30E-B Air Purifier
-                </h4>
-                <div className="flex flex-col gap-2 **:text-sm **:text-black/70">
-                  <li>GMP Cosmetic Good Manufacturing Practice</li>
-                  <li>GMP Cosmetic Good Manufacturing Practice</li>
-                  <li>GMP Cosmetic Good Manufacturing Practice</li>
-                  <li>GMP Cosmetic Good Manufacturing Practice</li>
+                <h4 className=" font-medium pb-4">{productDetails?.name}</h4>
+                <div className="flex flex-col gap-2 [&>*]:text-sm [&>*]:text-black/70">
+                  {features
+                    .slice(
+                      0,
+                      showAllFeatures ? features.length : initialFeaturesToShow
+                    )
+                    .map((feature, index) => (
+                      <li key={index}>{feature}</li>
+                    ))}
                 </div>
-              </div>
-              <div className="flex justify-center pt-2 items-center">
-                <button className="flex cursor-pointer items-center gap-1 font-medium text-sm">
-                  See More <ChevronDown strokeWidth={1.2} />
-                </button>
+
+                {features.length > initialFeaturesToShow && (
+                  <div className="flex justify-center pt-2 items-center">
+                    <button
+                      onClick={() => setShowAllFeatures(!showAllFeatures)}
+                      className="flex cursor-pointer items-center gap-1 font-medium text-sm transition-colors"
+                    >
+                      {showAllFeatures ? "Show Less" : "Show More"}
+                      {showAllFeatures ? (
+                        <ChevronUp strokeWidth={1.2} />
+                      ) : (
+                        <ChevronDown strokeWidth={1.2} />
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

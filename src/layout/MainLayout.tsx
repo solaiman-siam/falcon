@@ -3,7 +3,7 @@ import Navbar from '../shared/Navbar';
 import SubNavbar from '../shared/SubNavbar';
 import Breadcrumb from '../shared/Breadcrumb';
 import Footer from '../shared/Footer';
-
+import { Toaster } from 'react-hot-toast';
 const MainLayout = () => {
     return (
         <div className='font-poppins '>
@@ -12,6 +12,7 @@ const MainLayout = () => {
             <Breadcrumb/>
             <Outlet/>
             <Footer/>
+            <Toaster />
         </div>
     );
 };

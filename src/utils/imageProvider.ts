@@ -17,6 +17,10 @@ import Apple from '../assets/images/Apple.png'
 import Google from '../assets/images/Google.png'
 import CreditCards from '../assets/images/credit_cards.png'
 import Store from '../assets/images/store.png'
+import RisingStarShop from '../assets/images/rising_star_shop.png'
+import PnyLogo from '../assets/images/p&gLogo.png'
+import CheckMark from '../assets/images/checkMark.png'
+
 
 export const imageProvider ={
     Logo,
@@ -35,5 +39,8 @@ export const imageProvider ={
     Apple,
     Google,
     CreditCards,
-    Store
+    Store,
+    CheckMark,
+    PnyLogo,
+    RisingStarShop
 }
